@@ -1,69 +1,17 @@
-{% import _self as menus %}
+{% macro renderNestedArray(array) %}
+  <ul>
+    {% for key, item in array %}
+      <li>
+        {{ key }}
 
-{{ menus.menu_links(items, attributes, 0, menu_name, is_h2) }}
-
-{% macro menu_links(items, attributes, menu_level, menu_name, is_h2) %}
-
-  {% import _self as menus %}
-  {% if items %}
-    {% if menu_level == 0 %}
-      {%
-        set classesmenu = [
-        'list-terms',
-        'list-level-0',
-      ]
-      %}
-      <ul{{ attributes.addClass(classesmenu) }}>
-        {% for item in items %}
-          {%
-            set classes = [
-            item.is_expanded ? item_base ~ 'expanded',
-            item.is_collapsed ? item_base ~ 'collapsed',
-            item.in_active_trail ? item_base ~ 'active-trail',
-            'list-term-item-'~item.tid ,
-          ]
-          %}
-          <li{{ item.attributes.addClass(classes) }}>
-            {% set tmp = '<span>'~item.title~'</span>' %}
-            {% set link_text %}{{ tmp|raw }}{% endset %}
-            {#                        {{ link(link_text, item.url, {'class': [item.is_active ? 'active' : '']} ) }}#}
-            {% if is_h2 %}
-              <h2 class="list__title">{{ link(link_text, item.url, {'class': [item.is_active ? 'active' : '']} ) }}</h2>
-            {% else %}
-              <div class="list__title">{{ link(link_text, item.url, {'class': [item.is_active ? 'active' : '']} ) }}</div>
-            {% endif %}
-            {% if item.below %}
-              {{ menus.menu_links(item.below, attributes, menu_level + 1) }}
-            {% endif %}
-          </li>
-        {% endfor %}
-      </ul>
-
-    {% else %}
-
-      <ul class="list list-terms list-level-{{ menu_level }}">
-        {% for item in items %}
-          {%
-            set classes = [
-            item.is_expanded ? item_base ~ 'expanded',
-            item.is_collapsed ? item_base ~ 'collapsed',
-            item.in_active_trail ? item_base ~ 'active-trail',
-            'list-term-item-'~item.tid,
-          ]
-          %}
-          <li{{ item.attributes.addClass(classes) }}>
-            {% set tmp = '<span>'~item.title~'</span>' %}
-            {% set link_text %}{{ tmp|raw }}{% endset %}
-            {{ link(link_text, item.url, {'class': [item.is_active ? '' : '']} ) }}
-            {% if item.below %}
-              {{ menus.menu_links(item.below, attributes, menu_level + 1) }}
-            {% endif %}
-          </li>
-        {% endfor %}
-      </ul>
-
-    {% endif %}
-
-  {% endif %}
-
+        {% if item is iterable %}
+          {{ _self.renderNestedArray(item) }}
+        {% else %}
+          {{ item }}
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
 {% endmacro %}
+
+{{ _self.renderNestedArray(content) }}

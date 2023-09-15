@@ -1,35 +1,11 @@
 <?php
-
-/**
- * @file
- * Contains algus_pass.module.
- */
-
-use Drupal\Core\Routing\RouteMatchInterface;
-
-/**
- * Implements hook_help().
- */
-function algus_pass_help($route_name, RouteMatchInterface $route_match) {
-  switch ($route_name) {
-    // Main module help for the algus_pass module.
-    case 'help.page.algus_pass':
-      $output = '';
-      $output .= '<h3>' . t('About') . '</h3>';
-      $output .= '<p>' . t('Algus pass module') . '</p>';
-      return $output;
-
-    default:
-  }
-}
-
-/**
- * Implements hook_theme().
- */
-function algus_pass_theme() {
+function algus_pass_theme($existing, $type, $theme, $path)
+{
   return [
-    'algus_pass' => [
-      'render element' => 'children',
-    ],
+    'pass_list' => [
+      'variables' => [
+        'content' => []
+      ]
+    ]
   ];
 }

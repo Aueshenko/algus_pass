@@ -19,7 +19,6 @@ class CompanyController extends ControllerBase {
     }
     // Загружаем все термины данной таксономии и преобразуем их в массивы.
     $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadTree($taxonomy_name);
-    kint($terms);
     //Получить айди терминов, к которым есть доступ у текущего юзера (из БД)
     $user_terms = \Drupal::database()
       ->select('pass_access', 'p')
@@ -43,6 +42,8 @@ class CompanyController extends ControllerBase {
         }
       }
     }
+
+    //Поднимаемся вверх выводим всю структуру
     foreach ($filtered_terms as $filtered_term){
       while($filtered_term->parents[0] != 0){
         $parent_id = $filtered_term->parents[0];
@@ -54,8 +55,6 @@ class CompanyController extends ControllerBase {
         }
       }
     }
-    $result_massive = [];
-
     // Create an index for easy lookups
     $index = [];
     foreach ($filtered_terms as $term) {
@@ -72,13 +71,12 @@ class CompanyController extends ControllerBase {
         }
       }
     }
-    kint($result_massive);
 
-    $build[] = [
-      '#markup' => "HI",
+    $content = $result_massive;
+    return $build[] = [
+      '#theme' => 'pass_list',
+      '#content' => $content
     ];
-    // Возвращаем сгенерированный контент.
-    return $build;
   }
 
   function buildStructure($term, $index) {
