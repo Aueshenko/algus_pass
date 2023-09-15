@@ -1,0 +1,42 @@
+# Company routing definition
+company_entity.settings_tab:
+  route_name: company_entity.settings
+  title: 'Settings'
+  base_route: company_entity.settings
+
+entity.company_entity.canonical:
+  route_name: entity.company_entity.canonical
+  base_route: entity.company_entity.canonical
+  title: 'View'
+
+entity.company_entity.edit_form:
+  route_name: entity.company_entity.edit_form
+  base_route: entity.company_entity.canonical
+  title: 'Edit'
+
+entity.company_entity.delete_form:
+  route_name:  entity.company_entity.delete_form
+  base_route:  entity.company_entity.canonical
+  title: Delete
+  weight: 10
+# Password routing definition
+password_entity.settings_tab:
+  route_name: password_entity.settings
+  title: 'Settings'
+  base_route: password_entity.settings
+
+entity.password_entity.canonical:
+  route_name: entity.password_entity.canonical
+  base_route: entity.password_entity.canonical
+  title: 'View'
+
+entity.password_entity.edit_form:
+  route_name: entity.password_entity.edit_form
+  base_route: entity.password_entity.canonical
+  title: 'Edit'
+
+entity.password_entity.delete_form:
+  route_name:  entity.password_entity.delete_form
+  base_route:  entity.password_entity.canonical
+  title: Delete
+  weight: 10

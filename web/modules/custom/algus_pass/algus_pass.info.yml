@@ -1,0 +1,5 @@
+name: 'algus_pass'
+type: module
+description: 'Algus pass module'
+core_version_requirement: 9.x
+package: 'Custom'

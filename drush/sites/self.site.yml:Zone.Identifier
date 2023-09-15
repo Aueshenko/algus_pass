@@ -1,0 +1,4 @@
+[ZoneTransfer]
+ZoneId=3
+ReferrerUrl=https://github.com/drupal-composer/drupal-project/tree/9.x
+HostUrl=https://codeload.github.com/drupal-composer/drupal-project/zip/refs/heads/9.x

@@ -1,0 +1,13 @@
+{
+    "name": "algus_pass",
+    "type": "drupal-module",
+    "description": "Algus pass module",
+    "keywords": [
+    ],
+    "homepage": "https://www.drupal.org/project/algus_pass",
+    "minimum-stability": "dev",
+    "support": {
+        "issues": "https://www.drupal.org/project/issues/algus_pass",
+        "source": "http://cgit.drupalcode.org/algus_pass",
+    },
+}

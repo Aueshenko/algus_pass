@@ -1,0 +1,10 @@
+entity.company_entity.add_form:
+  route_name: entity.company_entity.add_form
+  title: 'Add Company'
+  appears_on:
+    - entity.company_entity.collection
+entity.password_entity.add_form:
+  route_name: entity.password_entity.add_form
+  title: 'Add Password'
+  appears_on:
+    - entity.password_entity.collection

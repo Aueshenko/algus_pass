@@ -1,0 +1,28 @@
+
+# Company menu items definition
+entity.company_entity.collection:
+  title: 'Company list'
+  route_name: entity.company_entity.collection
+  description: 'List Company entities'
+  parent: system.admin_structure
+  weight: 100
+
+company_entity.admin.structure.settings:
+  title: 'Company settings'
+  description: 'Configure Company entities'
+  route_name: company_entity.settings
+  parent: system.admin_structure
+
+# Password menu items definition
+entity.password_entity.collection:
+  title: 'Password list'
+  route_name: entity.password_entity.collection
+  description: 'List Password entities'
+  parent: system.admin_structure
+  weight: 100
+
+password_entity.admin.structure.settings:
+  title: 'Password settings'
+  description: 'Configure Password entities'
+  route_name: password_entity.settings
+  parent: system.admin_structure

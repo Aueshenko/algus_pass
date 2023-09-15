@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - taxonomy
+  enforced:
+    module:
+      - algus_pass
+name: 'taxonomy_folders'
+vid: taxonomy_folders
+description: 'This is the taxonomy folders.'

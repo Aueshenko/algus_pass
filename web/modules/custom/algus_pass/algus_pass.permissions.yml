@@ -1,0 +1,40 @@
+add company entities:
+  title: 'Create new Company entities'
+
+administer company entities:
+  title: 'Administer Company entities'
+  description: 'Allow to access the administration form to configure Company entities.'
+  restrict access: true
+
+delete company entities:
+  title: 'Delete Company entities'
+
+edit company entities:
+  title: 'Edit Company entities'
+
+view published company entities:
+  title: 'View published Company entities'
+
+view unpublished company entities:
+  title: 'View unpublished Company entities'
+
+add password entities:
+  title: 'Create new Password entities'
+
+administer password entities:
+  title: 'Administer Password entities'
+  description: 'Allow to access the administration form to configure Password entities.'
+  restrict access: true
+
+delete password entities:
+  title: 'Delete Password entities'
+
+edit password entities:
+  title: 'Edit Password entities'
+
+view published password entities:
+  title: 'View published Password entities'
+
+view unpublished password entities:
+  title: 'View unpublished Password entities'
+
