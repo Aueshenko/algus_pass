@@ -1,0 +1,22 @@
+uuid: 1f157058-411a-47ec-a88d-37666448b9a9
+langcode: ru
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_company
+  module:
+    - user
+id: user.user.field_company
+field_name: field_company
+entity_type: user
+bundle: user
+label: Компания
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:company_entity'
+  handler_settings: {  }
+field_type: entity_reference

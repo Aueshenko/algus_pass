@@ -1,0 +1,26 @@
+uuid: 7fa8feef-dedb-417c-a9dd-e2b0bd31763e
+langcode: ru
+status: true
+dependencies:
+  config:
+    - field.storage.taxonomy_term.field_company
+    - taxonomy.vocabulary.taxonomy_folders
+id: taxonomy_term.taxonomy_folders.field_company
+field_name: field_company
+entity_type: taxonomy_term
+bundle: taxonomy_folders
+label: Компания
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:company_entity'
+  handler_settings:
+    target_bundles: null
+    sort:
+      field: name
+      direction: ASC
+    auto_create: false
+field_type: entity_reference
