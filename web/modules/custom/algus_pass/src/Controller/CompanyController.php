@@ -35,7 +35,7 @@ class CompanyController extends ControllerBase
   protected function getFilteredTerms($taxonomy_name, $current_user, $current_user_id) {
     $filtered_terms = [];
     $company = $current_user->get('field_company')->target_id;
-
+    $entity_type = 'term';
     // Загружаем все термины данной таксономии и преобразуем их в массив.
     $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadTree($taxonomy_name);
 
@@ -44,6 +44,7 @@ class CompanyController extends ControllerBase
       ->select('pass_access', 'p')
       ->fields('p', ['entity_id'])
       ->condition('p.user_id', $current_user_id)
+      ->condition('p.entity_type', $entity_type)
       ->execute()
       ->fetchCol();
 
