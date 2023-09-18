@@ -45,16 +45,9 @@ class CompanyController extends ControllerBase
       }
     }
 
-    foreach ($filtered_terms as $filtered_term){
-      while($filtered_term->parents[0] != 0){
-        $parent_id = $filtered_term->parents[0];
-        foreach($terms as $term){
-          if($term->tid == $parent_id){
-            $filtered_terms[] = $term;
-            $filtered_term = $term;
-          }
-        }
-      }
+    //Рекурсивный обход вверх и получение родителей термина
+    foreach ($filtered_terms as $filtered_term) {
+      $this->findParents($filtered_terms, $filtered_term, $terms);
     }
 
     // Create an index for easy lookups
@@ -96,5 +89,20 @@ class CompanyController extends ControllerBase
       }
     }
     return $structure;
+  }
+
+  //Рекурсивный обход вверх чтобы записать всех родителей и вывести полную структуру
+  function findParents(&$filtered_terms, $term, $all_terms) {
+    if ($term->parents[0] == 0) {
+      return;
+    }
+    $parent_id = $term->parents[0];
+    foreach ($all_terms as $t) {
+      if ($t->tid == $parent_id) {
+        $filtered_terms[] = $t;
+        $this->findParents($filtered_terms, $t, $all_terms);
+        break;
+      }
+    }
   }
 }
