@@ -10,71 +10,78 @@ class CompanyController extends ControllerBase
 {
   public function taxonomy_folders()
   {
+    // Отключаем кеширование страницы.
     \Drupal::service('page_cache_kill_switch')->trigger();
 
-    // Здесь указываем машинное имя таксономии, которую хотим отобразить.
+    // Задаем машинное имя таксономии, которую хотим отобразить.
     $taxonomy_name = 'taxonomy_folders';
-    $curr_user = User::load(\Drupal::currentUser()->id());
-    $curr_user_id = \Drupal::currentUser()->id();
-    if ($curr_user) {
-      $company = $curr_user->get('field_company')->target_id;
-    }
-    // Загружаем все термины данной таксономии и преобразуем их в массивы.
+    // Получаем текущего пользователя и его айди.
+    $current_user = User::load(\Drupal::currentUser()->id());
+    $current_user_id = \Drupal::currentUser()->id();
+
+    // Фильтруем и получаем термины, которые видимы текущему пользователю.
+    $filtered_terms = $this->getFilteredTerms($taxonomy_name, $current_user, $current_user_id);
+
+    // Строим структуру терминов и создаем массив для вывода в твиг.
+    $result_massive = $this->buildTermStructure($filtered_terms);
+
+    return [
+      '#theme' => 'pass_list',
+      '#content' => $result_massive,
+    ];
+  }
+
+  // Метод для фильтрации терминов.
+  protected function getFilteredTerms($taxonomy_name, $current_user, $current_user_id) {
+    $filtered_terms = [];
+    $company = $current_user->get('field_company')->target_id;
+
+    // Загружаем все термины данной таксономии и преобразуем их в массив.
     $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadTree($taxonomy_name);
-    //Получить айди терминов, к которым есть доступ у текущего юзера (из БД)
+
+    // Получаем айди терминов, к которым есть доступ у текущего пользователя из базы данных.
     $user_terms = \Drupal::database()
       ->select('pass_access', 'p')
       ->fields('p', ['entity_id'])
-      ->condition('p.user_id', $curr_user_id)
-      ->execute()->fetchAll();
-    //Перезаписать в массив просто айдишники
-    $user_terms_massive = [];
-    foreach ($user_terms as $user_term) {
-      $user_terms_massive[] = $user_term->entity_id;
-    }
-    //Фильтруем термины по компании и по доступу пользователя
-    $filtered_terms = [];
+      ->condition('p.user_id', $current_user_id)
+      ->execute()
+      ->fetchCol();
+
+    // Фильтруем термины по компании и доступу пользователя.
     foreach ($terms as $term) {
-      // Загружаем термин с помощью его ID, чтобы получить доступ к полю 'field_company'.
       $term_entity = Term::load($term->tid);
-      // Проверяем, равно ли поле 'field_company' заданной компании.
-      if ($term_entity && in_array($term_entity->id(), $user_terms_massive)) {
-        if ($term_entity->get('field_company')->target_id == $company) {
-          $filtered_terms[] = $term;
-        }
+      if ($term_entity && in_array($term_entity->id(), $user_terms) && $term_entity->get('field_company')->target_id == $company) {
+        $filtered_terms[] = $term;
       }
     }
 
-    //Рекурсивный обход вверх и получение родителей термина
+    // Рекурсивно обходим термины вверх и получаем их родителей.
     foreach ($filtered_terms as $filtered_term) {
       $this->findParents($filtered_terms, $filtered_term, $terms);
     }
 
-    // Create an index for easy lookups
+    return $filtered_terms;
+  }
+
+  // Метод для построения структуры терминов.
+  protected function buildTermStructure($terms) {
     $index = [];
-    foreach ($filtered_terms as $term) {
+    foreach ($terms as $term) {
       $index[$term->tid] = $term;
     }
 
-    foreach ($filtered_terms as $term) {
+    $result_massive = [];
+
+    foreach ($terms as $term) {
       if ($term->depth == 1) {
         $children = $this->buildStructure($term, $index);
-        if (empty($children)) {
-          $result_massive[$term->name] = [];
-        } else {
-          $result_massive[$term->name] = $children;
-        }
+        $result_massive[$term->name] = empty($children) ? [] : $children;
       }
     }
 
-    $content = $result_massive;
-    return $build[] = [
-      '#theme' => 'pass_list',
-      '#content' => $content
-    ];
+    return $result_massive;
   }
-
-  //Рекурсивно строим массив перед твиг со вложенностью
+  // Метод для рекурсивного построения структуры терминов.
   function buildStructure($term, $index)
   {
     $structure = [];
@@ -91,7 +98,7 @@ class CompanyController extends ControllerBase
     return $structure;
   }
 
-  //Рекурсивный обход вверх чтобы записать всех родителей и вывести полную структуру
+  // Метод для рекурсивного поиска родителей терминов вверх.
   function findParents(&$filtered_terms, $term, $all_terms) {
     if ($term->parents[0] == 0) {
       return;
