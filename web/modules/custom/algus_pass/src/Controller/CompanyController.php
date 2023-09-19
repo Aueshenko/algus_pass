@@ -24,7 +24,6 @@ class CompanyController extends ControllerBase
 
     // Строим структуру терминов и создаем массив для вывода в твиг.
     $result_massive = $this->buildTermStructure($filtered_terms);
-    //kint($result_massive);
     return [
       '#theme' => 'pass_list',
       '#content' => $result_massive,
