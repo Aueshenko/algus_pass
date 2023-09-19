@@ -10,6 +10,7 @@ function algus_pass_theme($existing, $type, $theme, $path)
   ];
 }
 
+//Хук нужен для того, чтобы изменить запрос на получение представлений, получить нужные пароли(с доступами)
 function algus_pass_views_query_alter(&$view, &$query) {
 
   //Получаем айди термина из URL параметра
@@ -49,5 +50,21 @@ function algus_pass_views_query_alter(&$view, &$query) {
         }
       }
       break;
+  }
+}
+
+//Хук для того чтобы автоматически устанавливать поле Компания в термине таксономию(значение брать из Компании пользователя кто создаёт термин)
+function algus_pass_taxonomy_term_presave($term) {
+
+  //Машинное название таксономии
+  $taxonomy_name = 'taxonomy_folders';
+  $current_user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+  //Достаём компанию текущего юзера
+  $company = $current_user->get('field_company')->target_id;
+  if($company){
+    if ($term->bundle() == $taxonomy_name) {
+      //Устанавливаем в термине значение поля Company равным компании из объекта текущего пользователя друпал
+      $term->set('field_company', $company);
+    }
   }
 }
