@@ -15,6 +15,7 @@ class CompanyController extends ControllerBase
 
     // Задаем машинное имя таксономии, которую хотим отобразить.
     $taxonomy_name = 'taxonomy_folders';
+
     // Получаем текущего пользователя и его айди.
     $current_user = User::load(\Drupal::currentUser()->id());
     $current_user_id = \Drupal::currentUser()->id();

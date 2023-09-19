@@ -5,6 +5,8 @@ namespace Drupal\algus_pass\Form;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\taxonomy\Entity\Term;
+
 
 /**
  * Form controller for Company edit forms.
@@ -45,8 +47,10 @@ class CompanyEntityForm extends ContentEntityForm {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $entity = $this->entity;
-
     $status = parent::save($form, $form_state);
+
+    //Создаём термин таксономии(компанию)(уровень 0)
+    $this->createTaxonomyTerm($entity->label());
 
     switch ($status) {
       case SAVED_NEW:
@@ -62,5 +66,18 @@ class CompanyEntityForm extends ContentEntityForm {
     }
     $form_state->setRedirect('entity.company_entity.canonical', ['company_entity' => $entity->id()]);
   }
+  public function createTaxonomyTerm($term_name){
 
+    //Машинное имя таксономии
+    $taxonomy_name = 'taxonomy_folders';
+
+    // Создаем новый термин.
+    $term = Term::create([
+      'vid' => $taxonomy_name, // Машинное имя таксономии.
+      'name' => $term_name,
+    ]);
+
+    // Сохраняем термин.
+    $term->save();
+  }
 }
