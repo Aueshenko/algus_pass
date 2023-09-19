@@ -129,6 +129,16 @@ class PasswordEntity extends ContentEntityBase implements PasswordEntityInterfac
     $this->set('field_description', $description);
     return $this;
   }
+  public function getFolder()
+  {
+    return $this->field_folder->getValue()[0]['target_id'];
+  }
+
+  public function setFolder($folder)
+  {
+    $this->set('field_folder', $folder);
+    return $this;
+  }
   /**
    * {@inheritdoc}
    */

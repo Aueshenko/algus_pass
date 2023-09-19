@@ -24,7 +24,7 @@ class CompanyController extends ControllerBase
 
     // Строим структуру терминов и создаем массив для вывода в твиг.
     $result_massive = $this->buildTermStructure($filtered_terms);
-
+    //kint($result_massive);
     return [
       '#theme' => 'pass_list',
       '#content' => $result_massive,
@@ -75,27 +75,29 @@ class CompanyController extends ControllerBase
 
     foreach ($terms as $term) {
       if ($term->depth == 1) {
-        $children = $this->buildStructure($term, $index);
-        $result_massive[$term->name] = empty($children) ? [] : $children;
+        $result_massive[$term->name] = [
+          'tid' => $term->tid,
+          'children' => $this->buildStructure($term->tid, $index)
+        ];
       }
     }
 
     return $result_massive;
   }
   // Метод для рекурсивного построения структуры терминов.
-  function buildStructure($term, $index)
+  function buildStructure($tid, $index)
   {
     $structure = [];
+
     foreach ($index as $subterm) {
-      if ($subterm->parents[0] == $term->tid) {
-        $children = $this->buildStructure($subterm, $index);
-        if (empty($children)) {
-          $structure[$subterm->name] = [];
-        } else {
-          $structure[$subterm->name] = $children;
-        }
+      if ($subterm->parents[0] == $tid) {
+        $structure[$subterm->name] = [
+          'tid' => $subterm->tid,
+          'children' => $this->buildStructure($subterm->tid, $index)
+        ];
       }
     }
+
     return $structure;
   }
 

@@ -1,15 +1,14 @@
 {% macro renderNestedArray(array) %}
   <ul>
     {% for key, item in array %}
-      <li>
-        {{ key }}
-
-        {% if item is iterable %}
-          {{ _self.renderNestedArray(item) }}
-        {% else %}
-          {{ item }}
-        {% endif %}
-      </li>
+      {% if key is not same as('tid') and key is not same as('children') %}
+        <li>
+          <a href="/passwords/{{ item.tid }}">{{ key }}</a>
+        </li>
+      {% endif %}
+      {% if item is iterable and not item is empty %}
+        {{ _self.renderNestedArray(item) }}
+      {% endif %}
     {% endfor %}
   </ul>
 {% endmacro %}
