@@ -5,3 +5,11 @@ algus_pass.company:
     _title: 'Company'
   requirements:
     _permission: 'access content'
+
+algus_pass.access_pass:
+  path: '/access/pass/{id}'
+  defaults:
+    _form: '\Drupal\algus_pass\Form\AccessPassForm'
+    _title: 'Access Pass'
+  requirements:
+    _permission: 'access content'
