@@ -29,3 +29,12 @@ algus_pass.folders_create:
     _title: 'Создать папку'
   requirements:
     _permission: 'access content'
+
+algus_pass.pass_create:
+  path: '/pass/create/{id}'
+  defaults:
+    _form: '\Drupal\algus_pass\Form\PassCreateForm'
+    _title: 'Создать пароль'
+  requirements:
+    _permission: 'access content'
+
