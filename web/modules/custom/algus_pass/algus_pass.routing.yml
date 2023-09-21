@@ -10,7 +10,7 @@ algus_pass.access_pass:
   path: '/access/pass/{id}'
   defaults:
     _form: '\Drupal\algus_pass\Form\AccessPassForm'
-    _title: 'Access Pass'
+    _title: 'Доступ к паролю'
   requirements:
     _permission: 'access content'
 
@@ -18,6 +18,14 @@ algus_pass.access_folders:
   path: '/access/folders/{id}'
   defaults:
     _form: '\Drupal\algus_pass\Form\AccessFoldersForm'
-    _title: 'Access Folders'
+    _title: 'Доступ к папке'
+  requirements:
+    _permission: 'access content'
+
+algus_pass.folders_create:
+  path: '/folders/create'
+  defaults:
+    _form: '\Drupal\algus_pass\Form\FoldersCreateForm'
+    _title: 'Создать папку'
   requirements:
     _permission: 'access content'
