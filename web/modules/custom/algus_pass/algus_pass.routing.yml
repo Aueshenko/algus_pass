@@ -13,3 +13,11 @@ algus_pass.access_pass:
     _title: 'Access Pass'
   requirements:
     _permission: 'access content'
+
+algus_pass.access_folders:
+  path: '/access/folders/{id}'
+  defaults:
+    _form: '\Drupal\algus_pass\Form\AccessFoldersForm'
+    _title: 'Access Folders'
+  requirements:
+    _permission: 'access content'
