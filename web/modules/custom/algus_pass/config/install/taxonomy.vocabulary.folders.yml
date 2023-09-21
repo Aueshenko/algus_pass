@@ -6,6 +6,6 @@ dependencies:
   enforced:
     module:
       - algus_pass
-name: 'taxonomy_folders'
+name: 'Таксономия Папки'
 vid: taxonomy_folders
 description: 'This is the taxonomy folders.'
