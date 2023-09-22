@@ -1,4 +1,5 @@
 <?php
+
 function algus_pass_theme($existing, $type, $theme, $path)
 {
   return [

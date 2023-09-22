@@ -12,7 +12,13 @@ class CompanyController extends ControllerBase
   {
     // Отключаем кеширование страницы.
     \Drupal::service('page_cache_kill_switch')->trigger();
-
+    $users = \Drupal::database()
+      ->select('pass_access', 'p')
+      ->fields('p', ['user_id'])
+      ->condition('p.entity_type', 'node')
+      ->condition('p.entity_id', '2')
+      ->execute()
+      ->fetchCol();
     // Задаем машинное имя таксономии, которую хотим отобразить.
     $taxonomy_name = 'taxonomy_folders';
 

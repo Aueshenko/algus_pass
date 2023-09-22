@@ -38,3 +38,10 @@ algus_pass.pass_create:
   requirements:
     _permission: 'access content'
 
+algus_pass.access_edit:
+  path: '/access/edit'
+  defaults:
+    _form: '\Drupal\algus_pass\Form\AccessEditForm'
+    _title: 'Редактирование доступа'
+  requirements:
+    _permission: 'access content'

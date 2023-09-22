@@ -91,33 +91,6 @@ class AccessFoldersForm extends FormBase {
     if($curr_user){
       $company_id = $curr_user->get('field_company')->target_id;
     }
-    $form['users_list'] = [
-      '#type' => 'entity_autocomplete',
-      '#title' => t('Выберите пользователя'),
-      '#target_type' => 'user',
-      '#selection_handler' => 'views',
-      '#selection_settings' => [
-        'view' => [
-          'view_name' => 'users_from_company', // Имя вашего представления
-          'display_name' => 'entity_reference_1', // Имя отображения вашего представления
-          'arguments' => [$company_id], // Передайте ваш динамический аргумент здесь
-        ],
-      ],
-      '#maxlength' => 128,
-      '#required' => TRUE,
-    ];
-
-    // Выпадающий список доступов для выбора какой доступ выдать.
-    $form['select_access'] = [
-      '#type' => 'select',
-      '#title' => 'Выберите доступ',
-      '#options' => [
-        '1' => 'Чтение',
-        '2' => 'Редактирование',
-        '3' => 'Полный доступ',
-      ],
-      '#required' => TRUE, // Если поле обязательное.
-    ];
 
     // Создаем объект EntityQuery для пользователей.
     $query = \Drupal::entityQuery('user')
@@ -131,14 +104,40 @@ class AccessFoldersForm extends FormBase {
 
     // Загружаем полные объекты пользователей на основе полученных UID.
     $users = User::loadMultiple($uids);
+
     $names_of_users = [];
 
-    // Фильтруем пользователей, исключая тех, у кого уже есть доступ.
-    foreach($users as $user){
-      if(!in_array($user->id(),$already_with_access)){
-        $names_of_users[] = $user->getDisplayName();
+    foreach ($users as $user) {
+      if (!in_array($user->id(), $already_with_access)) {
+        // Получаем имя пользователя и его ID.
+        $user_name = $user->getDisplayName();
+        $user_id = $user->id();
+
+        // Формируем строку в формате "Имя (ID)" и добавляем её в массив $names_of_users.
+        $names_of_users[$user_id] = $user_name . ' (' . $user_id . ')';
       }
     }
+
+    // Выпадающий список для выбора пользователя.
+    $form['select_users'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Выберите пользователя'),
+      '#empty_option' => $this->t('- Выберите -'),
+      '#options' => $names_of_users,
+      '#required' => TRUE, // Если поле обязательное.
+    ];
+
+    // Выпадающий список доступов для выбора какой доступ выдать.
+    $form['select_access'] = [
+      '#type' => 'select',
+      '#title' => 'Выберите доступ',
+      '#options' => [
+        '1' => 'Чтение',
+        '2' => 'Редактирование',
+        '3' => 'Полный доступ',
+      ],
+      '#required' => TRUE, // Если поле обязательное.
+    ];
 
     // Добавляем список пользователей, которых можно добавить.
     $form['add_users'] = [
@@ -164,7 +163,7 @@ class AccessFoldersForm extends FormBase {
     $access_id = $form_state->getValue('select_access');
 
     // Получаем значение выбранного пользователя из формы.
-    $user_id = $form_state->getValue('users_list');
+    $user_id = $form_state->getValue('select_users');
 
     // Получаем идентификатор пароля из переменной формы.
     $pass_id = $form['#pass_id'];
