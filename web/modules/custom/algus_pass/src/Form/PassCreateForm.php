@@ -3,6 +3,7 @@ namespace Drupal\algus_pass\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 use Drupal\user\Entity\User;
 use Drupal\taxonomy\Entity\Term;
 
@@ -96,6 +97,11 @@ class PassCreateForm extends FormBase {
         'access' => 3
       ])
       ->execute();
+
+    // Указать URL для перенаправления
+    $url = Url::fromUri("internal:/passwords/$folder_id");
+    // Выполнить перенаправление
+    $form_state->setRedirectUrl($url);
   }
 
   //Получаем айди пароля из url параметра

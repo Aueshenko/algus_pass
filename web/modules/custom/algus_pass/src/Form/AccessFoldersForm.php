@@ -133,7 +133,9 @@ class AccessFoldersForm extends FormBase {
       }
     }
 
+    //Если есть доступные пользователи на добавление доступа, тогда выводим поля
     if($names_of_users){
+
       // Выпадающий список для выбора пользователя.
       $form['select_users'] = [
         '#type' => 'select',
@@ -168,6 +170,7 @@ class AccessFoldersForm extends FormBase {
       ];
     }
     else{
+
       // Добавляем сообщение о том, что нет доступных пользователей для добавления доступа.
       $form['h4_no_users_for_add_access'] = [
         '#type' => 'html_tag',
