@@ -23,9 +23,7 @@ class AccessDeleteForm extends FormBase {
       $form['#entity_type'] = $_GET['entity_type'];
 
       $user = User::load($uid);
-      if($user){
-        $username = $user->getDisplayName();
-      }
+      $username = $user ? $user->getDisplayName() : '';
 
       // Вы точно хотите удалить доступ пользователя ?
       $form['p_confirmation'] = [

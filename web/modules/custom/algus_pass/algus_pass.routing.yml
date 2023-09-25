@@ -1,11 +1,3 @@
-algus_pass.company:
-  path: '/company'
-  defaults:
-    _controller: '\Drupal\algus_pass\Controller\CompanyController::taxonomy_folders'
-    _title: 'Company'
-  requirements:
-    _permission: 'access content'
-
 algus_pass.access_pass:
   path: '/access/pass/{id}'
   defaults:

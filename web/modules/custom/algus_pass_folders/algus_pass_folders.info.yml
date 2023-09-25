@@ -1,0 +1,7 @@
+name: 'algus_pass_folders'
+type: module
+description: 'Algus pass module for folders'
+core_version_requirement: 9.x
+package: 'Custom'
+dependencies:
+  - drupal:block

@@ -1,17 +1,28 @@
 <?php
 
-namespace Drupal\algus_pass\Controller;
+namespace Drupal\algus_pass_folders\Plugin\Block;
 
-use Drupal\Core\Controller\ControllerBase;
-use Drupal\user\Entity\User;
+use Drupal\Core\Block\BlockBase;
 use Drupal\taxonomy\Entity\Term;
+use Drupal\user\Entity\User;
 
-class CompanyController extends ControllerBase
-{
-  public function taxonomy_folders()
-  {
+/**
+ * Provides a block with simple text.
+ *
+ * @Block (
+ *   id = "algus_pass_folders_block",
+ *   admin_label = @Translation("Папки")
+ * )
+ *
+ *
+ */
+class FoldersBlock extends BlockBase {
+
+  public function build() {
+
     // Отключаем кеширование страницы.
     \Drupal::service('page_cache_kill_switch')->trigger();
+
     $users = \Drupal::database()
       ->select('pass_access', 'p')
       ->fields('p', ['user_id'])
@@ -19,6 +30,7 @@ class CompanyController extends ControllerBase
       ->condition('p.entity_id', '2')
       ->execute()
       ->fetchCol();
+
     // Задаем машинное имя таксономии, которую хотим отобразить.
     $taxonomy_name = 'taxonomy_folders';
 
@@ -39,9 +51,11 @@ class CompanyController extends ControllerBase
 
   // Метод для фильтрации терминов.
   protected function getFilteredTerms($taxonomy_name, $current_user, $current_user_id) {
+
     $filtered_terms = [];
     $company = $current_user->get('field_company')->target_id;
     $entity_type = 'term';
+
     // Загружаем все термины данной таксономии и преобразуем их в массив.
     $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadTree($taxonomy_name);
 
@@ -72,6 +86,7 @@ class CompanyController extends ControllerBase
 
   // Метод для построения структуры терминов.
   protected function buildTermStructure($terms) {
+
     $index = [];
     foreach ($terms as $term) {
       $index[$term->tid] = $term;
@@ -90,9 +105,11 @@ class CompanyController extends ControllerBase
 
     return $result_massive;
   }
+
   // Метод для рекурсивного построения структуры терминов.
   function buildStructure($tid, $index)
   {
+
     $structure = [];
 
     foreach ($index as $subterm) {
@@ -109,9 +126,11 @@ class CompanyController extends ControllerBase
 
   // Метод для рекурсивного поиска родителей терминов вверх.
   function findParents(&$filtered_terms, $term, $all_terms) {
+
     if ($term->parents[0] == 0) {
       return;
     }
+
     $parent_id = $term->parents[0];
     foreach ($all_terms as $t) {
       if ($t->tid == $parent_id) {
