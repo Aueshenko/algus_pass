@@ -45,3 +45,11 @@ algus_pass.access_edit:
     _title: 'Редактирование доступа'
   requirements:
     _permission: 'access content'
+
+algus_pass.access_delete:
+  path: '/access/delete'
+  defaults:
+    _form: '\Drupal\algus_pass\Form\AccessDeleteForm'
+    _title: 'Удаление доступа'
+  requirements:
+    _permission: 'access content'

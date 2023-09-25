@@ -80,10 +80,23 @@ class AccessFoldersForm extends FormBase {
         'width' => 700,
       ]);
 
+      // Создаем ссылку "Удалить доступ" с использованием Ajax modal dialog.
+      $access_delete = Link::fromTextAndUrl('Удалить доступ', Url::fromUserInput('/access/delete', ['query' => ['uid' => $user_id,'entity_type' => 'term', 'entity_id' => $pass_id]]));
+      $access_delete = $access_delete->toRenderable();
+      $access_delete['#attributes']['class'][] = 'use-ajax';
+      $access_delete['#attributes']['class'][] = 'button';
+      $access_delete['#attributes']['data-dialog-type'] = 'modal';
+
+      // Устанавливаем параметры модального окна для изменения его размера.
+      $access_delete['#attributes']['data-dialog-options'] = json_encode([
+        'width' => 700,
+      ]);
+
       $rows[] = [
         'name' => $name,
         'access' => $name_of_access[$user->access],
-        'contact' => render($access_edit),
+        'access_edit' => \Drupal::service('renderer')->render($access_edit),
+        'access_delete' => \Drupal::service('renderer')->render($access_delete),
       ];
     }
 

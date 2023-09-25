@@ -6,11 +6,11 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\user\Entity\User;
 use Drupal\Core\Url;
 
-class AccessEditForm extends FormBase {
+class AccessDeleteForm extends FormBase {
 
   // Метод для получения идентификатора формы.
   public function getFormId() {
-    return 'algus_pass_access_edit_form';
+    return 'algus_pass_access_delete_form';
   }
 
   // Метод для построения формы.
@@ -22,32 +22,22 @@ class AccessEditForm extends FormBase {
       $form['#entity_id'] = $_GET['entity_id'];
       $form['#entity_type'] = $_GET['entity_type'];
 
-
       $user = User::load($uid);
       if($user){
-        $user_name = $user->getDisplayName();
+        $username = $user->getDisplayName();
       }
-      $form['user_name'] = [
+
+      // Вы точно хотите удалить доступ пользователя ?
+      $form['p_confirmation'] = [
         '#type' => 'html_tag',
         '#tag' => 'p',
-        '#value' => "Пользователь: <b>$user_name</b>"
+        '#value' => "Вы точно хотите удалить доступ для пользователя <b>$username</b> ?"
       ];
 
-      $form['select_access'] = [
-        '#type' => 'select',
-        '#title' => t('Измените доступ'),
-        '#id' => 'limiter',
-        '#options' => [
-          1 => 'Чтение',
-          2 => 'Редактирование',
-          3 => 'Полный доступ'
-        ],
-      ];
-
-      // Добавляем кнопку "Изменить".
+      // Добавляем кнопку "Удалить".
       $form['submit'] = [
         '#type' => 'submit',
-        '#value' => 'Изменить',
+        '#value' => 'Удалить',
       ];
 
       return $form;
@@ -56,21 +46,18 @@ class AccessEditForm extends FormBase {
 
   public function submitForm(array &$form, FormStateInterface $form_state) {
 
-    //Написать запром на изменение записи(доступа) в базе данных
-    //Изменить запись в бд, где user_id = $user_id и entity_type = $entity_type и entity_id = $entity_id
     $uid = $form['#uid'];
     $entity_type = $form['#entity_type'];
     $entity_id = $form['#entity_id'];
-    $new_access = $form_state->getValue('select_access');
 
     \Drupal::database()
-      ->update('pass_access')
-      ->fields(['access' => $new_access])
+      ->delete('pass_access')
       ->condition('user_id', $uid)
       ->condition('entity_type', $entity_type)
       ->condition('entity_id', $entity_id)
       ->execute();
 
+    //Перенаправление на страницу с доступами к ПАРОЛЮ/ПАПКЕ
     if($entity_type === 'node'){
       // Указать URL для перенаправления
       $url = Url::fromUri("internal:/access/pass/$entity_id");
