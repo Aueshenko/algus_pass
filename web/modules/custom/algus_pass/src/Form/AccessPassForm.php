@@ -6,6 +6,8 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\user\Entity\User;
 use Drupal\Core\Url;
 use Drupal\Core\Link;
+use Drupal\Component\Serialization\Json;
+
 
 
 class AccessPassForm extends FormBase {
@@ -69,9 +71,22 @@ class AccessPassForm extends FormBase {
       $user_object = User::load($user_id);
       $name = $user_object ? $user_object->getDisplayName() : 'Пользователь не найден';
 
+      // Создаем ссылку "Изменить доступ" с использованием Ajax modal dialog.
+      $access_edit = Link::fromTextAndUrl('Изменить доступ', Url::fromUserInput('/access/edit', ['query' => ['uid' => $user_id,'entity_type' => 'node', 'entity_id' => $pass_id]]));
+      $access_edit = $access_edit->toRenderable();
+      $access_edit['#attributes']['class'][] = 'use-ajax';
+      $access_edit['#attributes']['class'][] = 'button';
+      $access_edit['#attributes']['data-dialog-type'] = 'modal';
+
+      // Устанавливаем параметры модального окна для изменения его размера.
+      $access_edit['#attributes']['data-dialog-options'] = json_encode([
+        'width' => 700,
+      ]);
+
       $rows[] = [
         'name' => $name,
         'access' => $name_of_access[$user->access],
+        'contact' => render($access_edit),
       ];
     }
 

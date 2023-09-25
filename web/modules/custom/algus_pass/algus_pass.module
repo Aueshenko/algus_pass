@@ -69,3 +69,9 @@ function algus_pass_taxonomy_term_presave($term) {
     }
   }
 }
+
+function algus_pass_preprocess_page(&$vars) {
+  //custom logic of when to include the library
+  // ....
+  $vars['#attached']['library'][] =  'core/drupal.dialog.ajax';
+}
