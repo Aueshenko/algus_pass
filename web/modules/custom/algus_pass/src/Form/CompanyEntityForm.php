@@ -50,7 +50,7 @@ class CompanyEntityForm extends ContentEntityForm {
     $status = parent::save($form, $form_state);
 
     //Создаём термин таксономии(компанию)(уровень 0)
-    $this->createTaxonomyTerm($entity->label());
+    $this->createTaxonomyTerm($entity->label(), $entity->id());
 
     switch ($status) {
       case SAVED_NEW:
@@ -66,7 +66,7 @@ class CompanyEntityForm extends ContentEntityForm {
     }
     $form_state->setRedirect('entity.company_entity.canonical', ['company_entity' => $entity->id()]);
   }
-  public function createTaxonomyTerm($term_name){
+  public function createTaxonomyTerm($term_name, $company_id){
 
     //Машинное имя таксономии
     $taxonomy_name = 'taxonomy_folders';

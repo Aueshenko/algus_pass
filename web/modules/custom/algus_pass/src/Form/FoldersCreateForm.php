@@ -88,16 +88,30 @@ class FoldersCreateForm extends FormBase {
   private function getTaxonomyTermOptions() {
 
     $taxonomy_vid = 'taxonomy_folders';
+    //Получаем айди компании текущего юзера
+    $current_user = User::load(\Drupal::currentUser()->id());
+    if($current_user){
+      $company = $current_user->get('field_company')->target_id;
+    }
+
+    //Получаем айдишники терминов, которые соответствуют нашей компании(чтобы отфильтровать выпадающий список)
+    $ids = \Drupal::database()
+      ->select('taxonomy_term__field_company', 'f')
+      ->fields('f',['entity_id'])
+      ->condition('f.field_company_target_id', $company)
+      ->execute()->fetchCol();
 
     $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
     $terms = $term_storage->loadTree($taxonomy_vid);
 
     $options = [];
 
+    //Выводим только те папки, которые принадлежат Компании
     foreach ($terms as $term) {
-      $options[$term->tid] = str_repeat('-', $term->depth) . $term->name . ' (' . $term->tid . ')';
+      if(in_array($term->tid, $ids)){
+        $options[$term->tid] = str_repeat('-', $term->depth) . $term->name . ' (' . $term->tid . ')';
+      }
     }
-
     return $options;
   }
 }
