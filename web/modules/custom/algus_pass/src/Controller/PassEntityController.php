@@ -3,6 +3,9 @@
 namespace Drupal\algus_pass\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Symfony\Component\HttpFoundation\Response;
+use Sunra\PhpSimple\HtmlDomParser;
+
 
 class PassEntityController extends ControllerBase {
 
@@ -30,7 +33,9 @@ class PassEntityController extends ControllerBase {
       $password = $password_entity->get('field_password')->value;
       $url = $password_entity->get('field_url')->value;
       $description = $password_entity->get('field_description')->value;
-      $icon = $password_entity->get('field_icon')->value;
+
+      //Получаем фавиконку сайта
+      $icon_url = !empty($url) ? 'http://www.google.com/s2/favicons?domain=' . urlencode(str_replace("http://", "", $url)) : '';
 
       // Создать массив данных для передачи в шаблон Twig.
       $content = [
@@ -40,7 +45,7 @@ class PassEntityController extends ControllerBase {
         'password' => $password,
         'url' => $url,
         'description' => $description,
-        'icon' => $icon,
+        'icon' => $icon_url,
       ];
 
       // Передать массив данных в шаблон Twig.
@@ -50,5 +55,4 @@ class PassEntityController extends ControllerBase {
       ];
     }
   }
-
 }
