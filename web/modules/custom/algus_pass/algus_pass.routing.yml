@@ -30,6 +30,14 @@ algus_pass.pass_create:
   requirements:
     _permission: 'access content'
 
+algus_pass.pass_edit:
+  path: '/pass/edit/{id}'
+  defaults:
+    _form: '\Drupal\algus_pass\Form\PassEditForm'
+    _title: 'Изменить пароль'
+  requirements:
+    _permission: 'access content'
+
 algus_pass.access_edit:
   path: '/access/edit'
   defaults:
