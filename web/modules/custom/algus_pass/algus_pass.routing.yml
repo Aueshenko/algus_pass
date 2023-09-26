@@ -45,3 +45,19 @@ algus_pass.access_delete:
     _title: 'Удаление доступа'
   requirements:
     _permission: 'access content'
+
+algus_pass.pass_list_page:
+  path: '/passwords/{tid}'
+  defaults:
+    _controller: '\Drupal\algus_pass\Controller\PassListController::PassListPage'
+    _title: 'Список паролей'
+  requirements:
+    _permission: 'access content'
+
+algus_pass.password_entity:
+  path: '/password_entity/{id}'
+  defaults:
+    _controller: '\Drupal\algus_pass\Controller\PassEntityController::PassEntityPage'
+    _title: 'Пароль'
+  requirements:
+    _permission: 'access content'

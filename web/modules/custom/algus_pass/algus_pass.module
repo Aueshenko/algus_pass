@@ -3,7 +3,18 @@
 function algus_pass_theme($existing, $type, $theme, $path)
 {
   return [
+    'folders_list' => [
+      'variables' => [
+        'content' => []
+      ]
+    ],
     'pass_list' => [
+      'variables' => [
+        'content' => [],
+        'variables' => []
+      ]
+    ],
+    'pass_entity' => [
       'variables' => [
         'content' => []
       ]

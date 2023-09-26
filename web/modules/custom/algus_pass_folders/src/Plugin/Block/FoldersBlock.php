@@ -44,7 +44,7 @@ class FoldersBlock extends BlockBase {
     // Строим структуру терминов и создаем массив для вывода в твиг.
     $result_massive = $this->buildTermStructure($filtered_terms);
     return [
-      '#theme' => 'pass_list',
+      '#theme' => 'folders_list',
       '#content' => $result_massive,
     ];
   }

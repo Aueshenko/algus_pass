@@ -1,0 +1,18 @@
+<a href="/folders/create">Создать папку</a>
+
+{% macro renderNestedArray(array) %}
+  <ul>
+    {% for key, item in array %}
+      {% if key is not same as('tid') and key is not same as('children') %}
+        <li>
+          <a href="/passwords/{{ item.tid }}">{{ key }}</a>
+        </li>
+      {% endif %}
+      {% if item is iterable and not item is empty %}
+        {{ _self.renderNestedArray(item) }}
+      {% endif %}
+    {% endfor %}
+  </ul>
+{% endmacro %}
+
+{{ _self.renderNestedArray(content) }}

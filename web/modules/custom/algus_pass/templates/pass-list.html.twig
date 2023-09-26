@@ -1,18 +1,6 @@
-<a href="/folders/create">Создать папку</a>
+<a href="http://drupal9.localhost/access/folders/{{variables}}">Выдать доступ к папке</a></br>
+<a href="http://drupal9.localhost/pass/create/{{variables}}">Создать пароль</a></br>
 
-{% macro renderNestedArray(array) %}
-  <ul>
-    {% for key, item in array %}
-      {% if key is not same as('tid') and key is not same as('children') %}
-        <li>
-          <a href="/passwords/{{ item.tid }}">{{ key }}</a>
-        </li>
-      {% endif %}
-      {% if item is iterable and not item is empty %}
-        {{ _self.renderNestedArray(item) }}
-      {% endif %}
-    {% endfor %}
-  </ul>
-{% endmacro %}
-
-{{ _self.renderNestedArray(content) }}
+{% for item_id, item_title in content %}
+  <a href="/password_entity/{{ item_id }}">{{ item_title }}</a><br>
+{% endfor %}
