@@ -1,13 +1,35 @@
 <?php
 namespace Drupal\algus_pass\Form;
 
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\user\Entity\User;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class AccessFoldersForm extends FormBase {
+
+  protected $database;
+  protected $currentUser;
+  protected $requestStack;
+
+  public function __construct(Connection $database, AccountInterface $current_user, RequestStack $requestStack) {
+    $this->database = $database;
+    $this->currentUser = $current_user;
+    $this->requestStack = $requestStack;
+  }
+
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('database'),
+      $container->get('current_user'),
+      $container->get('request_stack')
+    );
+  }
 
   // Метод для получения идентификатора формы.
   public function getFormId() {
@@ -32,7 +54,7 @@ class AccessFoldersForm extends FormBase {
 
     // Получаем айди пароля из URL параметра, если он передан.
     if (!$pass_id) {
-      $pass_id = $this->getIdFromUrl(\Drupal::request()->getRequestUri());
+      $pass_id = $this->getIdFromUrl($this->requestStack->getCurrentRequest()->getRequestUri());
     }
 
     // Добавляем заголовок "Текущие доступы".
@@ -43,7 +65,7 @@ class AccessFoldersForm extends FormBase {
     ];
 
     // Запрашиваем пользователей у которых есть доступ к пароля из БД.
-    $users = \Drupal::database()
+    $users = $this->database
       ->select('pass_access', 'p')
       ->fields('p', ['user_id','access'])
       ->condition('p.entity_type',$entity_type)
@@ -115,7 +137,7 @@ class AccessFoldersForm extends FormBase {
     ];
 
     //Поисковое поле с выпадающим списком пользователей( у которых компания равна компании текущего юзера)
-    $curr_user = User::load(\Drupal::currentUser()->id());
+    $curr_user = User::load($this->currentUser->id());
     if($curr_user){
       $company_id = $curr_user->get('field_company')->target_id;
     }
@@ -210,7 +232,7 @@ class AccessFoldersForm extends FormBase {
     $pass_id = $form['#pass_id'];
 
     // Вставляем новую запись в таблицу 'pass_access' в базе данных.
-    $access = \Drupal::database()
+    $access = $this->database
       ->insert('pass_access')
       ->fields([
         'entity_type' => 'term',

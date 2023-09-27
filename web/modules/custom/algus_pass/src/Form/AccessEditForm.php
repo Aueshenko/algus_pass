@@ -5,8 +5,22 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\user\Entity\User;
 use Drupal\Core\Url;
+use Drupal\Core\Database\Connection;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class AccessEditForm extends FormBase {
+
+  protected $database;
+
+  public function __construct(Connection $database) {
+    $this->database = $database;
+  }
+
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('database')
+    );
+  }
 
   // Метод для получения идентификатора формы.
   public function getFormId() {
@@ -63,7 +77,7 @@ class AccessEditForm extends FormBase {
     $entity_id = $form['#entity_id'];
     $new_access = $form_state->getValue('select_access');
 
-    \Drupal::database()
+    $this->database
       ->update('pass_access')
       ->fields(['access' => $new_access])
       ->condition('user_id', $uid)

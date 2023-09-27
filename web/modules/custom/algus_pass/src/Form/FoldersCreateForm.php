@@ -1,13 +1,34 @@
 <?php
 namespace Drupal\algus_pass\Form;
 
+use Drupal\Core\Database\Connection;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\user\Entity\User;
 use Drupal\taxonomy\Entity\Term;
-
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class FoldersCreateForm extends FormBase {
+
+  protected $database;
+  protected $currentUser;
+  protected $entityTypeManager;
+
+  public function __construct(Connection $database, AccountInterface $current_user, EntityTypeManagerInterface $entityTypeManager) {
+    $this->database = $database;
+    $this->currentUser = $current_user;
+    $this->entityTypeManager = $entityTypeManager;
+  }
+
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('database'),
+      $container->get('current_user'),
+      $container->get('entity_type.manager')
+    );
+  }
 
   // Метод для получения идентификатора формы.
   public function getFormId() {
@@ -72,8 +93,8 @@ class FoldersCreateForm extends FormBase {
     \Drupal::messenger()->addMessage($this->t('Папка "@name" успешно создана.', ['@name' => $name]));
 
     // Выполняем SQL-запрос для добавления записи в таблицу pass_access.
-    $curr_user_id = \Drupal::currentUser()->id();
-    $access = \Drupal::database()
+    $curr_user_id = $this->currentUser->id();
+    $access = $this->database
       ->insert('pass_access')
       ->fields([
         'entity_type' => 'term',
@@ -89,19 +110,19 @@ class FoldersCreateForm extends FormBase {
 
     $taxonomy_vid = 'taxonomy_folders';
     //Получаем айди компании текущего юзера
-    $current_user = User::load(\Drupal::currentUser()->id());
+    $current_user = User::load($this->currentUser->id());
     if($current_user){
       $company = $current_user->get('field_company')->target_id;
     }
 
     //Получаем айдишники терминов, которые соответствуют нашей компании(чтобы отфильтровать выпадающий список)
-    $ids = \Drupal::database()
+    $ids = $this->database
       ->select('taxonomy_term__field_company', 'f')
       ->fields('f',['entity_id'])
       ->condition('f.field_company_target_id', $company)
       ->execute()->fetchCol();
 
-    $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+    $term_storage = $this->entityTypeManager->getStorage('taxonomy_term');
     $terms = $term_storage->loadTree($taxonomy_vid);
 
     $options = [];

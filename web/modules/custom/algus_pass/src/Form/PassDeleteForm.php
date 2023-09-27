@@ -1,6 +1,7 @@
 <?php
 namespace Drupal\algus_pass\Form;
 
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -10,14 +11,18 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class PassDeleteForm extends FormBase {
 
   protected $database;
+  protected $entityTypeManager;
 
-  public function __construct(Connection $database) {
+
+  public function __construct(Connection $database, EntityTypeManagerInterface $entityTypeManager) {
     $this->database = $database;
+    $this->entityTypeManager = $entityTypeManager;
   }
 
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('database')
+      $container->get('database'),
+      $container->get('entity_type.manager')
     );
   }
 
@@ -62,8 +67,7 @@ class PassDeleteForm extends FormBase {
 
     //Получить айди папки к которой принадлежит пароль
     // Загружаем сущность Password Entity по ID.
-    $entity_type_manager = \Drupal::entityTypeManager();
-    $password_entity = $entity_type_manager->getStorage('password_entity')->load($pass_id);
+    $password_entity = $this->entityTypeManager->getStorage('password_entity')->load($pass_id);
 
     if ($password_entity) {
 

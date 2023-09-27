@@ -1,14 +1,40 @@
 <?php
 namespace Drupal\algus_pass\Form;
 
+use Drupal\Core\Database\Connection;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\user\Entity\User;
 use Drupal\taxonomy\Entity\Term;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 
 class PassCreateForm extends FormBase {
+
+  protected $database;
+  protected $currentUser;
+  protected $requestStack;
+  protected $entityTypeManager;
+
+  public function __construct(Connection $database, AccountInterface $current_user, RequestStack $requestStack, EntityTypeManagerInterface $entityTypeManager) {
+    $this->database = $database;
+    $this->currentUser = $current_user;
+    $this->requestStack = $requestStack;
+    $this->entityTypeManager = $entityTypeManager;
+  }
+
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('database'),
+      $container->get('current_user'),
+      $container->get('request_stack'),
+      $container->get('entity_type.manager')
+    );
+  }
 
   // Метод для получения идентификатора формы.
   public function getFormId() {
@@ -55,7 +81,7 @@ class PassCreateForm extends FormBase {
     ];
     // Получаем айди пароля из URL параметра, если он передан.
     if (!$folder_id) {
-      $folder_id = $this->getIdFromUrl(\Drupal::request()->getRequestUri());
+      $folder_id = $this->getIdFromUrl($this->requestStack->getCurrentRequest()->getRequestUri());
     }
     $form['#folder_id'] = $folder_id;
 
@@ -70,7 +96,7 @@ class PassCreateForm extends FormBase {
     $folder_id = $form['#folder_id'];
 
     // Создаем новую сущность password_entity.
-    $entity = \Drupal::entityTypeManager()->getStorage('password_entity')->create([
+    $entity = $this->entityTypeManager->getStorage('password_entity')->create([
       'name' => $values['name'],
       'field_login' => $values['login'],
       'field_password' => $values['password'],
@@ -84,11 +110,11 @@ class PassCreateForm extends FormBase {
 
     // Получаем ID только что созданной сущности.
     $pass_id = $entity->id();
-    $user_id = \Drupal::currentUser()->id();
+    $user_id = $this->currentUser->id();
     \Drupal::messenger()->addMessage($this->t('Пароль успешно создан.'));
 
     // Вставляем новую запись в таблицу 'pass_access' в базе данных.
-    $access = \Drupal::database()
+    $access = $this->database
       ->insert('pass_access')
       ->fields([
         'entity_type' => 'node',

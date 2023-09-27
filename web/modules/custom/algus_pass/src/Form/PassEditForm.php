@@ -1,11 +1,28 @@
 <?php
 namespace Drupal\algus_pass\Form;
 
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class PassEditForm extends FormBase {
+
+  protected $entityTypeManager;
+  protected $requestStack;
+
+  public function __construct(EntityTypeManagerInterface $entityTypeManager,RequestStack $requestStack) {
+    $this->entityTypeManager = $entityTypeManager;
+    $this->requestStack = $requestStack;
+  }
+
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('entity_type.manager'),
+      $container->get('request_stack')
+    );
+  }
 
   // Метод для получения идентификатора формы.
   public function getFormId() {
@@ -20,15 +37,12 @@ class PassEditForm extends FormBase {
 
     // Получаем айди пароля из URL параметра, если он передан.
     if (!$pass_id) {
-      $pass_id = $this->getIdFromUrl(\Drupal::request()->getRequestUri());
+      $pass_id = $this->getIdFromUrl($this->requestStack->getCurrentRequest()->getRequestUri());
     }
     $form['#pass_id'] = $pass_id;
 
-    // Получить сервис Entity Type Manager.
-    $entity_type_manager = \Drupal::entityTypeManager();
-
     // Загрузить кастомную сущность Password Entity по ID.
-    $password_entity = $entity_type_manager->getStorage('password_entity')->load($pass_id);
+    $password_entity = $this->entityTypeManager->getStorage('password_entity')->load($pass_id);
 
     //Если пароль получен
     if($password_entity) {
@@ -89,8 +103,7 @@ class PassEditForm extends FormBase {
     $pass_id = $form['#pass_id'];
 
     // Загружаем сущность Password Entity по ID.
-    $entity_type_manager = \Drupal::entityTypeManager();
-    $password_entity = $entity_type_manager->getStorage('password_entity')->load($pass_id);
+    $password_entity = $this->entityTypeManager->getStorage('password_entity')->load($pass_id);
 
     // Если пароль получен
     if ($password_entity) {

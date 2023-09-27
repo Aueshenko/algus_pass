@@ -5,8 +5,22 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\user\Entity\User;
 use Drupal\Core\Url;
+use Drupal\Core\Database\Connection;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class AccessDeleteForm extends FormBase {
+
+  protected $database;
+
+  public function __construct(Connection $database) {
+    $this->database = $database;
+  }
+
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('database')
+    );
+  }
 
   // Метод для получения идентификатора формы.
   public function getFormId() {
@@ -48,7 +62,7 @@ class AccessDeleteForm extends FormBase {
     $entity_type = $form['#entity_type'];
     $entity_id = $form['#entity_id'];
 
-    \Drupal::database()
+    $this->database
       ->delete('pass_access')
       ->condition('user_id', $uid)
       ->condition('entity_type', $entity_type)
