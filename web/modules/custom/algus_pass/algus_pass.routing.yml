@@ -38,6 +38,14 @@ algus_pass.pass_edit:
   requirements:
     _permission: 'access content'
 
+algus_pass.pass_delete:
+  path: '/pass/delete/{id}'
+  defaults:
+    _form: '\Drupal\algus_pass\Form\PassDeleteForm'
+    _title: 'Удалить пароль'
+  requirements:
+    _permission: 'access content'
+
 algus_pass.access_edit:
   path: '/access/edit'
   defaults:

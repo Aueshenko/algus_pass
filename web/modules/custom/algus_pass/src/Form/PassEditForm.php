@@ -4,7 +4,6 @@ namespace Drupal\algus_pass\Form;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
-use Drupal\user\Entity\User;
 
 class PassEditForm extends FormBase {
 
