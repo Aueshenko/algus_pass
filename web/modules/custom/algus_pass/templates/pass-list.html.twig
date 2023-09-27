@@ -1,6 +1,8 @@
 {% if variables.user_access == 3 %}
   <a href="http://drupal9.localhost/access/folders/{{ variables.folder_id }}">Выдать доступ к папке</a></br>
   <a href="http://drupal9.localhost/pass/create/{{ variables.folder_id }}">Создать пароль</a></br>
+{% elseif variables.user_access == 2 %}
+  <a href="http://drupal9.localhost/pass/create/{{ variables.folder_id }}">Создать пароль</a></br>
 {% endif %}
 
 
