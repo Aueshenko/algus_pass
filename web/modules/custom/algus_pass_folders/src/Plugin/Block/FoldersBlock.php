@@ -3,8 +3,13 @@
 namespace Drupal\algus_pass_folders\Plugin\Block;
 
 use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\user\Entity\User;
+use Drupal\Core\Database\Connection;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a block with simple text.
@@ -16,37 +21,53 @@ use Drupal\user\Entity\User;
  *
  *
  */
-class FoldersBlock extends BlockBase {
+class FoldersBlock extends BlockBase implements ContainerFactoryPluginInterface {
+
+  protected $currentUser;
+  protected $database;
+  protected $entityTypeManager;
+
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, AccountInterface $current_user,Connection $database,EntityTypeManagerInterface $entityTypeManager) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->currentUser = $current_user;
+    $this->database = $database;
+    $this->entityTypeManager = $entityTypeManager;
+  }
+
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('current_user'),
+      $container->get('database'),
+      $container->get('entity_type.manager')
+    );
+  }
 
   public function build() {
+    if($this->currentUser->isAuthenticated()){
+      // Отключаем кеширование страницы.
+      \Drupal::service('page_cache_kill_switch')->trigger();
 
-    // Отключаем кеширование страницы.
-    \Drupal::service('page_cache_kill_switch')->trigger();
+      // Задаем машинное имя таксономии, которую хотим отобразить.
+      $taxonomy_name = 'taxonomy_folders';
 
-    $users = \Drupal::database()
-      ->select('pass_access', 'p')
-      ->fields('p', ['user_id'])
-      ->condition('p.entity_type', 'node')
-      ->condition('p.entity_id', '2')
-      ->execute()
-      ->fetchCol();
+      // Получаем текущего пользователя и его айди.
+      $current_user = User::load($this->currentUser->id());
+      $current_user_id = $this->currentUser->id();
 
-    // Задаем машинное имя таксономии, которую хотим отобразить.
-    $taxonomy_name = 'taxonomy_folders';
+      // Фильтруем и получаем термины, которые видимы текущему пользователю.
+      $filtered_terms = $this->getFilteredTerms($taxonomy_name, $current_user, $current_user_id);
 
-    // Получаем текущего пользователя и его айди.
-    $current_user = User::load(\Drupal::currentUser()->id());
-    $current_user_id = \Drupal::currentUser()->id();
+      // Строим структуру терминов и создаем массив для вывода в твиг.
+      $result_massive = $this->buildTermStructure($filtered_terms);
 
-    // Фильтруем и получаем термины, которые видимы текущему пользователю.
-    $filtered_terms = $this->getFilteredTerms($taxonomy_name, $current_user, $current_user_id);
-
-    // Строим структуру терминов и создаем массив для вывода в твиг.
-    $result_massive = $this->buildTermStructure($filtered_terms);
-    return [
-      '#theme' => 'folders_list',
-      '#content' => $result_massive,
-    ];
+      return [
+        '#theme' => 'folders_list',
+        '#content' => $result_massive,
+      ];
+    }
   }
 
   // Метод для фильтрации терминов.
@@ -57,10 +78,10 @@ class FoldersBlock extends BlockBase {
     $entity_type = 'term';
 
     // Загружаем все термины данной таксономии и преобразуем их в массив.
-    $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadTree($taxonomy_name);
+    $terms = $this->entityTypeManager->getStorage('taxonomy_term')->loadTree($taxonomy_name);
 
     // Получаем айди терминов, к которым есть доступ у текущего пользователя из базы данных.
-    $user_terms = \Drupal::database()
+    $user_terms = $this->database
       ->select('pass_access', 'p')
       ->fields('p', ['entity_id'])
       ->condition('p.user_id', $current_user_id)
@@ -125,7 +146,8 @@ class FoldersBlock extends BlockBase {
   }
 
   // Метод для рекурсивного поиска родителей терминов вверх.
-  function findParents(&$filtered_terms, $term, $all_terms) {
+  function findParents(&$filtered_terms, $term, $all_terms)
+  {
 
     if ($term->parents[0] == 0) {
       return;

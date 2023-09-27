@@ -1,11 +1,25 @@
 <?php
 namespace Drupal\algus_pass\Form;
 
+use Drupal\Core\Url;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Url;
+use Drupal\Core\Database\Connection;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class PassDeleteForm extends FormBase {
+
+  protected $database;
+
+  public function __construct(Connection $database) {
+    $this->database = $database;
+  }
+
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('database')
+    );
+  }
 
   // Метод для получения идентификатора формы.
   public function getFormId() {
@@ -18,17 +32,11 @@ class PassDeleteForm extends FormBase {
     // Отключаем кеширование формы.
     \Drupal::service('page_cache_kill_switch')->trigger();
 
-    // Получаем айди пароля из URL параметра, если он передан.
-    if (!$pass_id) {
-      $pass_id = $this->getIdFromUrl(\Drupal::request()->getRequestUri());
-    }
-    $form['#pass_id'] = $pass_id;
+    // Получаем айди пароля из URL
+    $form['#pass_id'] = $pass_id ?? $this->getIdFromUrl($this->getRequest()->getRequestUri());
 
-    // Вы точно хотите удалить доступ пользователя ?
     $form['p_confirmation'] = [
-      '#type' => 'html_tag',
-      '#tag' => 'p',
-      '#value' => "Вы точно хотите удалить пароль?"
+      '#markup' => $this->t('Вы точно хотите удалить пароль?</br>'),
     ];
 
     // Добавляем кнопку для отправки формы.
@@ -46,7 +54,7 @@ class PassDeleteForm extends FormBase {
     $pass_id = $form['#pass_id'];
 
     //Удаляем все записи о доступах из бд к этому паролю
-    \Drupal::database()
+    $this->database
       ->delete('pass_access')
       ->condition('entity_type', 'node')
       ->condition('entity_id', $pass_id)
@@ -66,12 +74,14 @@ class PassDeleteForm extends FormBase {
 
       //Удаляем сущность
       $password_entity->delete();
-    }
 
-    // Указать URL для перенаправления
-    $url = Url::fromUri("internal:/passwords/$folder_id");
-    // Выполнить перенаправление
-    $form_state->setRedirectUrl($url);
+      // Указать URL для перенаправления
+      if (isset($folder_id)) {
+        $url = Url::fromUri("internal:/passwords/$folder_id");
+        // Выполнить перенаправление
+        $form_state->setRedirectUrl($url);
+      }
+    }
   }
 
   //Получаем айди пароля из url параметра

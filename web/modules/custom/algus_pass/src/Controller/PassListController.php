@@ -2,6 +2,8 @@
 
 namespace Drupal\algus_pass\Controller;
 
+use Drupal\Core\Database\Connection;
+use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -10,14 +12,23 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class PassListController extends ControllerBase {
 
   protected $entityTypeManager;
+  protected $database;
+  protected $currentUser;
+  protected $requestStack;
 
-  public function __construct(EntityTypeManagerInterface $entityTypeManager) {
+  public function __construct(EntityTypeManagerInterface $entityTypeManager, Connection $database, AccountInterface $current_user, RequestStack $requestStack) {
     $this->entityTypeManager = $entityTypeManager;
+    $this->database = $database;
+    $this->currentUser = $current_user;
+    $this->requestStack = $requestStack;
   }
 
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get('database'),
+      $container->get('current_user'),
+      $container->get('request_stack')
     );
   }
 
@@ -26,10 +37,10 @@ class PassListController extends ControllerBase {
     // Отключаем кеширование страницы.
     \Drupal::service('page_cache_kill_switch')->trigger();
 
-    $curr_uid = \Drupal::currentUser()->id();
+    $curr_uid = $this->currentUser->id();
 
     //Получить id папки из url
-    $current_url = \Drupal::request()->getRequestUri();
+    $current_url = $this->requestStack->getCurrentRequest()->getRequestUri();
     $parts = explode('/', $current_url);
     $folder_id = end($parts);
 
@@ -39,7 +50,7 @@ class PassListController extends ControllerBase {
     $result = $query->execute();
 
     //Получаем айди паролей, к которым есть доступ у текущего пользователя
-    $access_pass_ids = \Drupal::database()
+    $access_pass_ids = $this->database
       ->select('pass_access', 'p')
       ->fields('p', ['entity_id'])
       ->condition('p.entity_type', 'node')
@@ -58,10 +69,26 @@ class PassListController extends ControllerBase {
     foreach ($passwords as $password) {
       $pass_for_show[$password->id()] = $password->label();
     }
+
+    //Получаем Доступ юзера к папке, если он не равен 3, значит убираем все кнопки
+    $user_access = $this->database
+      ->select('pass_access', 'a')
+      ->fields('a', ['access'])
+      ->condition('a.user_id', $curr_uid)
+      ->condition('a.entity_type', 'term')
+      ->condition('a.entity_id', $folder_id)
+      ->execute()->fetchCol();
+
+    //Отправляем айди папки и максимальный доступ к этой папке в твиг
+    $variables = [
+      'folder_id' => $folder_id,
+      'user_access' => max($user_access)
+    ];
+
     return [
       '#theme' => 'pass_list',
       '#content' => $pass_for_show,
-      '#variables' => $folder_id
+      '#variables' => $variables
     ];
   }
 
