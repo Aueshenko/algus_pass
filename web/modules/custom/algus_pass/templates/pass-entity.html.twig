@@ -1,6 +1,8 @@
-<a href="http://drupal9.localhost/access/pass/{{content.id}}">Выдать доступ к паролю</a></br>
-<a href="http://drupal9.localhost/pass/edit/{{content.id}}">Изменить пароль</a></br>
-<a href="http://drupal9.localhost/pass/delete/{{content.id}}">Удалить пароль</a></br>
+{% if variables.user_access == 3 %}
+<a href="http://drupal9.localhost/access/pass/{{variables.pass_id}}">Выдать доступ к паролю</a></br>
+<a href="http://drupal9.localhost/pass/edit/{{variables.pass_id}}">Изменить пароль</a></br>
+<a href="http://drupal9.localhost/pass/delete/{{variables.pass_id}}">Удалить пароль</a></br>
+{% endif %}
 
 Название: {{ content.name }}<br>
 Логин: {{ content.login }}<br>

@@ -16,7 +16,8 @@ function algus_pass_theme($existing, $type, $theme, $path)
     ],
     'pass_entity' => [
       'variables' => [
-        'content' => []
+        'content' => [],
+        'variables' => []
       ]
     ]
   ];

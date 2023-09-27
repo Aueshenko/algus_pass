@@ -80,10 +80,17 @@ class PassListController extends ControllerBase {
       ->execute()->fetchCol();
 
     //Отправляем айди папки и максимальный доступ к этой папке в твиг
-    $variables = [
-      'folder_id' => $folder_id,
-      'user_access' => max($user_access)
-    ];
+    if($user_access){
+      $variables = [
+        'user_access' => max($user_access),
+        'folder_id' => $folder_id
+      ];
+    }
+    else{
+      $variables = [
+        'folder_id' => $folder_id
+      ];
+    }
 
     return [
       '#theme' => 'pass_list',
