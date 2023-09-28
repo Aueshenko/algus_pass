@@ -33,9 +33,17 @@ class AccessEditForm extends FormBase {
     if (isset($_GET['uid'], $_GET['entity_type'], $_GET['entity_id'])) {
 
       $uid = $form['#uid'] = $_GET['uid'];
-      $form['#entity_id'] = $_GET['entity_id'];
-      $form['#entity_type'] = $_GET['entity_type'];
+      $entity_id = $form['#entity_id'] = $_GET['entity_id'];
+      $entity_type = $form['#entity_type'] = $_GET['entity_type'];
 
+      //Получаем текущий доступ пользователя из БД
+      $current_access = $this->database
+        ->select('pass_access','p')
+        ->fields('p',['access'])
+        ->condition('p.user_id', $uid)
+        ->condition('p.entity_type', $entity_type)
+        ->condition('p.entity_id', $entity_id)
+        ->execute()->fetchAssoc();
 
       $user = User::load($uid);
       if($user){
@@ -51,11 +59,12 @@ class AccessEditForm extends FormBase {
         '#type' => 'select',
         '#title' => t('Измените доступ'),
         '#id' => 'limiter',
+        '#default_value' => $current_access,
         '#options' => [
           1 => 'Чтение',
           2 => 'Редактирование',
           3 => 'Полный доступ'
-        ],
+        ]
       ];
 
       // Добавляем кнопку "Изменить".

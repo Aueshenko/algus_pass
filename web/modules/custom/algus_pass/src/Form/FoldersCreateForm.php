@@ -52,7 +52,6 @@ class FoldersCreateForm extends FormBase {
     $form['parent'] = [
       '#type' => 'select',
       '#title' => $this->t('Родительская папка (опционально)'),
-      '#empty_option' => $this->t('- Нет -'),
       '#options' => $this->getTaxonomyTermOptions(),
     ];
 
