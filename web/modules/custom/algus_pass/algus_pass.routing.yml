@@ -22,6 +22,14 @@ algus_pass.folders_create:
   requirements:
     _permission: 'access content'
 
+algus_pass.folders_delete:
+  path: '/folders/delete/{id}'
+  defaults:
+    _form: '\Drupal\algus_pass\Form\FoldersDeleteForm'
+    _title: 'Удалить папку'
+  requirements:
+    _permission: 'access content'
+
 algus_pass.pass_create:
   path: '/pass/create/{id}'
   defaults:

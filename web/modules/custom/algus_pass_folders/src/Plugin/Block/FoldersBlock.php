@@ -47,8 +47,6 @@ class FoldersBlock extends BlockBase implements ContainerFactoryPluginInterface 
 
   public function build() {
     if($this->currentUser->isAuthenticated()){
-      // Отключаем кеширование страницы.
-      \Drupal::service('page_cache_kill_switch')->trigger();
 
       // Задаем машинное имя таксономии, которую хотим отобразить.
       $taxonomy_name = 'taxonomy_folders';
@@ -66,6 +64,7 @@ class FoldersBlock extends BlockBase implements ContainerFactoryPluginInterface 
       return [
         '#theme' => 'folders_list',
         '#content' => $result_massive,
+        '#cache' => ['max-age' => 0],
       ];
     }
   }

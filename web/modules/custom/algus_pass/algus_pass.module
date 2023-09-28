@@ -24,47 +24,47 @@ function algus_pass_theme($existing, $type, $theme, $path)
 }
 
 //Хук нужен для того, чтобы изменить запрос на получение представлений, получить нужные пароли(с доступами)
-function algus_pass_views_query_alter(&$view, &$query) {
-
-  //Получаем айди термина из URL параметра
-  //Работает и без этого(стандартный функционал это делает)
-  //то есть пароли выводятся только с нужной папки(без лишних доработок)
-  //$term_id = \Drupal::routeMatch()->getParameter('arg_0');
-
-  //Меняй запрос $query добавляй условия и получай нужные данные на странице
-  $curr_user_id = \Drupal::currentUser()->id();
-  $entity_type = 'node';
-
-  //Получить все entity_id, у которых user_id = $curr_user_id и entity_type = "node"
-  $passwords_ids_with_access = \Drupal::database()
-    ->select('pass_access', 'p')
-    ->fields('p',['entity_id'])
-    ->condition('p.user_id', $curr_user_id)
-    ->condition('p.entity_type', $entity_type)
-    ->execute()
-    ->fetchAll();
-
-  // Создаем массив из айди паролей с доступом для текущего юзера
-  $password_ids = array_column($passwords_ids_with_access, 'entity_id');
-
-  switch($view->storage->id()) {
-    case 'passwords':
-      if ($view->current_display === 'page_1') {
-        //Проверка на пустоту
-        if($password_ids){
-          //Пароли уже выводятся только те, которые принадлежат папкам(терминам)
-
-          // Добавляем условие, что айди пароля должен входить в $password_ids
-          $query->addWhere('conditions', 'password_entity.id', $password_ids, 'IN');
-        }
-        else{
-          //Если никаких доступов к паролям не найдено у пользователя, тогда ничего не выводим
-          $query->addWhere('conditions', 'password_entity.id', 0, '=');
-        }
-      }
-      break;
-  }
-}
+//function algus_pass_views_query_alter(&$view, &$query) {
+//
+//  //Получаем айди термина из URL параметра
+//  //Работает и без этого(стандартный функционал это делает)
+//  //то есть пароли выводятся только с нужной папки(без лишних доработок)
+//  //$term_id = \Drupal::routeMatch()->getParameter('arg_0');
+//
+//  //Меняй запрос $query добавляй условия и получай нужные данные на странице
+//  $curr_user_id = \Drupal::currentUser()->id();
+//  $entity_type = 'node';
+//
+//  //Получить все entity_id, у которых user_id = $curr_user_id и entity_type = "node"
+//  $passwords_ids_with_access = \Drupal::database()
+//    ->select('pass_access', 'p')
+//    ->fields('p',['entity_id'])
+//    ->condition('p.user_id', $curr_user_id)
+//    ->condition('p.entity_type', $entity_type)
+//    ->execute()
+//    ->fetchAll();
+//
+//  // Создаем массив из айди паролей с доступом для текущего юзера
+//  $password_ids = array_column($passwords_ids_with_access, 'entity_id');
+//
+//  switch($view->storage->id()) {
+//    case 'passwords':
+//      if ($view->current_display === 'page_1') {
+//        //Проверка на пустоту
+//        if($password_ids){
+//          //Пароли уже выводятся только те, которые принадлежат папкам(терминам)
+//
+//          // Добавляем условие, что айди пароля должен входить в $password_ids
+//          $query->addWhere('conditions', 'password_entity.id', $password_ids, 'IN');
+//        }
+//        else{
+//          //Если никаких доступов к паролям не найдено у пользователя, тогда ничего не выводим
+//          $query->addWhere('conditions', 'password_entity.id', 0, '=');
+//        }
+//      }
+//      break;
+//  }
+//}
 
 //Хук для того чтобы автоматически устанавливать поле Компания в термине таксономию(значение брать из Компании пользователя кто создаёт термин)
 function algus_pass_taxonomy_term_presave($term) {
