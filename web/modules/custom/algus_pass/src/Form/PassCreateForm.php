@@ -74,6 +74,23 @@ class PassCreateForm extends FormBase {
       '#type' => 'textarea',
       '#title' => $this->t('Описание'),
     ];
+
+    //Поле выбора тегов
+    $form['tags'] = [
+      '#type' => 'entity_autocomplete',
+      '#target_type' => 'taxonomy_term',
+      '#title' => $this->t('Выберите теги'),
+      '#tags' => TRUE, // Этот параметр разрешает выбор нескольких тегов.
+      '#autocomplete_route_name' => 'entity.taxonomy_term.autocomplete', // Имя маршрута для автозаполнения тегов.
+      '#selection_settings' => [
+        'target_bundles' => ['tags'], // имя таксономии, откуда делать выборку
+      ],
+      //Если тег не найден, то он будет создан
+      '#autocreate' => [
+        'bundle' => 'tags', // Обязательный параметр. Указывается какой тип будет создаваться.
+      ],
+    ];
+
     // Добавляем кнопку для отправки формы.
     $form['submit'] = [
       '#type' => 'submit',
@@ -95,6 +112,9 @@ class PassCreateForm extends FormBase {
     // Получаем идентификатор пароля из переменной формы.
     $folder_id = $form['#folder_id'];
 
+    // Получите выбранные теги.
+    $selected_tags = $values['tags'];
+
     // Создаем новую сущность password_entity.
     $entity = $this->entityTypeManager->getStorage('password_entity')->create([
       'name' => $values['name'],
@@ -102,7 +122,8 @@ class PassCreateForm extends FormBase {
       'field_password' => $values['password'],
       'field_url' => $values['link'],
       'field_description' => $values['description'],
-      'field_folder' => $folder_id
+      'field_folder' => $folder_id,
+      'field_tag' => $selected_tags, // Устанавливаем выбранные теги для сущности.
     ]);
 
     // Сохраняем сущность в базе данных.
@@ -111,7 +132,6 @@ class PassCreateForm extends FormBase {
     // Получаем ID только что созданной сущности.
     $pass_id = $entity->id();
     $user_id = $this->currentUser->id();
-    \Drupal::messenger()->addMessage($this->t('Пароль успешно создан.'));
 
     // Вставляем новую запись в таблицу 'pass_access' в базе данных.
     $access = $this->database

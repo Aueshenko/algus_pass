@@ -139,6 +139,22 @@ class PasswordEntity extends ContentEntityBase implements PasswordEntityInterfac
     $this->set('field_folder', $folder);
     return $this;
   }
+  public function getTags() {
+    $tags = $this->field_tag->referencedEntities();
+    $tag_labels = [];
+
+    foreach ($tags as $tag) {
+      $tag_labels[] = $tag->label();
+    }
+
+    return implode(', ', $tag_labels);
+  }
+
+  public function setTags($tags)
+  {
+    $this->set('field_tag', $tags);
+    return $this;
+  }
   /**
    * {@inheritdoc}
    */

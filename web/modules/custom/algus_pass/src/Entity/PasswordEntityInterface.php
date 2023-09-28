@@ -64,4 +64,6 @@ interface PasswordEntityInterface extends ContentEntityInterface, EntityChangedI
   public function setDescription($description);
   public function getFolder();
   public function setFolder($folder);
+  public function getTags();
+  public function setTags($tags);
 }

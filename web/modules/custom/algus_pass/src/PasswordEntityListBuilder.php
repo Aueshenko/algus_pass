@@ -24,6 +24,7 @@ class PasswordEntityListBuilder extends EntityListBuilder {
     $header['url'] = $this->t('Ссылка');
     $header['description'] = $this->t('Описание');
     $header['folder'] = $this->t('Папка');
+    $header['tags'] = $this->t('Теги');
     return $header + parent::buildHeader();
   }
 
@@ -44,6 +45,7 @@ class PasswordEntityListBuilder extends EntityListBuilder {
     $row['url'] = $entity->getUrl();
     $row['description'] = $entity->getDescription();
     $row['folder'] = $entity->getFolder();
+    $row['tags'] = $entity->getTags();
     return $row + parent::buildRow($entity);
   }
 
