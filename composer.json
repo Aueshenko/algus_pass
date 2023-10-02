@@ -24,6 +24,8 @@
         "drupal/console": "~1.0",
         "drupal/core-composer-scaffold": "^9.4",
         "drupal/core-recommended": "^9.4",
+        "drupal/search_api": "^1.29",
+        "drupal/search_api_solr": "^4.3",
         "drush/drush": "^11.0",
         "vlucas/phpdotenv": "^5.1",
         "webflo/drupal-finder": "^1.2"

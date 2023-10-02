@@ -44,3 +44,22 @@ function algus_pass_preprocess_page(&$vars) {
   // ....
   $vars['#attached']['library'][] =  'core/drupal.dialog.ajax';
 }
+
+//Хук для того чтобы изменить запрос индекс Search Api
+function algus_pass_search_api_query_alter(\Drupal\search_api\Query\QueryInterface $query) {
+  // Проверяем, что индекс называется "passwords".
+  if ($query->getIndex()->id() === 'passwords') {
+    $user = \Drupal::currentUser();
+
+    $ids = \Drupal::database()
+      ->select('pass_access', 'p')
+      ->fields('p', ['entity_id'])
+      ->condition('p.entity_type', 'node') // <--
+      ->condition('p.user_id', $user->id()) // <--
+      ->execute()->fetchCol();
+
+    // Добавьте условие к запросу.
+    $query->addCondition('id', $ids, 'IN');
+
+  }
+}
